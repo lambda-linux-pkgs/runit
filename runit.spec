@@ -17,7 +17,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Url:            http://smarden.org/runit/
 Source0:        http://smarden.org/runit/runit-%{version}.tar.gz
-Source1:        runsvdir-start.service
 Patch:          runit-2.1.2-etc-service.patch
 Patch1:         runit-2.1.2-runsvdir-path-cleanup.patch
 Patch2:         runit-2.1.2-term-hup-option.patch
@@ -26,9 +25,7 @@ Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
 
 BuildRequires: make gcc
-%if 0%{?rhel} >= 6
 BuildRequires:  glibc-static
-%endif
 
 Summary:        A UNIX init scheme with service supervision
 
@@ -71,19 +68,11 @@ done
 %{__install} -d -m 0755 %{buildroot}/etc/service
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
-# For systemd only
-%if 0%{?rhel} >= 7
-%{__install} -D -p -m 0644 $RPM_SOURCE_DIR/runsvdir-start.service \
-                       $RPM_BUILD_ROOT%{_unitdir}/runsvdir-start.service
-echo %{_unitdir}/runsvdir-start.service > %{EXTRA_FILES}
-%endif
-
 %clean
 %{__rm} -rf %{buildroot}
 
 %post
 if [ $1 = 1 ] ; then
-  %if 0%{?rhel} >= 6 <= 7
     rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
     if [ $? -eq 0 ]; then
       cat >/etc/init/runsvdir.conf <<\EOT
@@ -97,23 +86,6 @@ EOT
     # tell init to start the new service
       start runsvdir
     fi
-  %endif
-
-  %if 0%{?rhel} >= 7
-    systemctl enable runsvdir-start
-    systemctl start runsvdir-start
-  %endif
-
-  %if 0%{?rhel} < 6
-    grep -q 'RI:2345:respawn:/sbin/runsvdir-start' /etc/inittab
-    if [ $? -eq 1 ]; then
-      echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
-      echo "RI:2345:respawn:/sbin/runsvdir-start" >> /etc/inittab
-      echo " success."
-      # Reload init
-      telinit q
-    fi
-  %endif
 fi
 
 %preun
@@ -121,22 +93,12 @@ if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     stop runsvdir
   fi
-  if [ -f /usr/lib/systemd/system/runsvdir-start.service ]; then
-    systemctl stop runsvdir-start
-    systemctl disable runsvdir-start
-  fi
 fi
 
 %postun
 if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     rm -f /etc/init/runsvdir.conf
-  fi
-  if grep -q runsvdir-start /etc/inittab 2>/dev/null; then
-    echo " #################################################"
-    echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
-    echo " # if you really want to remove runit            #"
-    echo " #################################################"
   fi
 fi
 
