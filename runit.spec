@@ -3,12 +3,9 @@
 #
 # Copyright (c) 2010 Ian Meyer <ianmmeyer@gmail.com>
 
-## This package understands the following switches:
-## --with dietlibc ...  statically links against dietlibc
-
 Name:           runit
 Version:        2.1.2
-Release:        1%{?_with_dietlibc:diet}%{?dist}
+Release:        1%{?dist}
 
 Group:          System/Base
 License:        BSD
@@ -33,8 +30,6 @@ BuildRequires: make gcc
 BuildRequires:  glibc-static
 %endif
 
-%{?_with_dietlibc:BuildRequires:        dietlibc}
-
 Summary:        A UNIX init scheme with service supervision
 
 %description
@@ -53,8 +48,8 @@ Authors:
 %prep
 %setup -q -n admin/%{name}-%{version}
 pushd src
-echo "%{?_with_dietlibc:diet -Os }%__cc $RPM_OPT_FLAGS" >conf-cc
-echo "%{?_with_dietlibc:diet -Os }%__cc -Os -pipe"      >conf-ld
+echo "%__cc $RPM_OPT_FLAGS" >conf-cc
+echo "%__cc -Os -pipe"      >conf-ld
 popd
 %patch
 %patch1
