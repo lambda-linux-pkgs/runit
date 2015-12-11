@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#
+# If you would like to use syslog instead of svlogd, then use the 
+# following commands to log to syslog using logger. You can 
+# `man logger` for more details.
+#
+# exec 1> >(exec /usr/bin/logger -p user.info -t TAG)
+# exec 2> >(exec /usr/bin/logger -p user.err  -t TAG)
+#
+
+#
+# Use this when *not* using syslog so svlogd also captures stderr
+#
+exec 2>&1
+
+exec chpst -u USER COMMAND

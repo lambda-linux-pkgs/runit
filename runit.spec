@@ -17,12 +17,16 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Url:            http://smarden.org/runit/
 Source0:        http://smarden.org/runit/runit-%{version}.tar.gz
+Source1:        template-log
+Source2:        template-run
 Patch:          runit-2.1.2-etc-service.patch
 Patch1:         runit-2.1.2-runsvdir-path-cleanup.patch
 Patch2:         runit-2.1.2-term-hup-option.patch
 
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
+
+Requires:       bash
 
 BuildRequires: make gcc
 BuildRequires:  glibc-static
@@ -69,6 +73,10 @@ done
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
 install -d %{buildroot}%{_sysconfdir}/%{name}
+
+install -d %{buildroot}%{_defaultdocdir}/%{name}-%{version}/template
+install -D -m 0755 %{SOURCE1} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/template/log
+install -D -m 0755 %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/template/run
 
 %clean
 %{__rm} -rf %{buildroot}

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# NOTE: This command uses `svlogd`. Please see `template/run` for example of 
+# using syslog.
+#
+exec chpst -u USER svlogd -tt LOGDIR
