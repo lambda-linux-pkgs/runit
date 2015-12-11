@@ -73,9 +73,9 @@ done
 
 %post
 if [ $1 = 1 ] ; then
-    rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-    if [ $? -eq 0 ]; then
-      cat >/etc/init/runsvdir.conf <<\EOT
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]; then
+    cat >/etc/init/runsvdir.conf <<\EOT
 # for runit - manage /usr/sbin/runsvdir-start
 start on runlevel [2345]
 stop on runlevel [^2345]
@@ -83,15 +83,25 @@ normal exit 0 111
 respawn
 exec /sbin/runsvdir-start
 EOT
-    # tell init to start the new service
-      start runsvdir
+    # start daemon if we are not in a chroot
+    if test -f /proc/1/exe -a -d /proc/1/root; then
+      if test "$(/usr/bin/stat -Lc '%D-%i' /)" = "$(/usr/bin/stat -Lc '%D-%i' /proc/1/root)"; then
+        # tell (upstart) init to start the new service
+        start runsvdir
+      fi
     fi
+  fi
 fi
 
 %preun
 if [ $1 = 0 ]; then
-  if [ -f /etc/init/runsvdir.conf ]; then
-    stop runsvdir
+  # stop daemon if we are not in a chroot
+  if test -f /proc/1/exe -a -d /proc/1/root; then
+    if test "$(/usr/bin/stat -Lc '%D-%i' /)" = "$(/usr/bin/stat -Lc '%D-%i' /proc/1/root)"; then
+      if [ -f /etc/init/runsvdir.conf ]; then
+        stop runsvdir
+      fi
+    fi
   fi
 fi
 
