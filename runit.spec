@@ -143,6 +143,15 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Fri Dec 11 2015 Rajiv M Ranganath <rajiv.ranganath@atihita.com> 2.1.2-1
+- Add runit templates to help users get started
+- Add `/etc/runit` directory
+- Disable starting when running inside chroot
+- Remove `systemd` and RHEL specific stuff
+- Disable `dietlibc`
+- Import spec file and patches from `runit-rpm`
+- Add `runit-2.1.2.tar.gz`
+
 * Thu Aug 21 2014 Chris Gaffney <gaffneyc@gmail.com> 2.1.2-1
 - Initial release of 2.1.2
 
