@@ -68,6 +68,8 @@ done
 %{__install} -d -m 0755 %{buildroot}/etc/service
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
+install -d %{buildroot}%{_sysconfdir}/%{name}
+
 %clean
 %{__rm} -rf %{buildroot}
 
@@ -128,6 +130,7 @@ fi
 %doc doc/* etc/
 %doc package/CHANGES package/COPYING package/README package/THANKS package/TODO
 %dir /etc/service
+%dir %{_sysconfdir}/%{name}
 
 %changelog
 * Thu Aug 21 2014 Chris Gaffney <gaffneyc@gmail.com> 2.1.2-1
